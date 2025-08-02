@@ -1,0 +1,12 @@
+{% extends "basic.html" %}
+{% block body %}
+{% for p in post  %}
+{{p.title}} <br>
+<h1>===========================================</h1>
+
+<img src="{{ p.image.url }}" alt="{{ p.title }}">
+
+{% endfor %}
+
+
+{% endblock body %}
