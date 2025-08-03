@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tuition',           # 👈 your custom app
     'crispy_forms',      # optional
-    'crispy_bootstrap4',  # ✅ এটা যোগ করো
+    'crispy_bootstrap4',  
+    'multiselectfield',
 ]
 
 MIDDLEWARE = [

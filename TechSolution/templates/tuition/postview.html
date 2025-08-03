@@ -1,12 +1,25 @@
 {% extends "basic.html" %}
+
 {% block body %}
-{% for p in post  %}
-{{p.title}} <br>
-<h1>===========================================</h1>
-
-<img src="{{ p.image.url }}" alt="{{ p.title }}">
-
-{% endfor %}
-
-
+<div class="container mt-4">
+    {% for p in post %}
+        <div class="card mb-3 p-3 shadow rounded">
+            <h3>Id: {{ p.id }}</h3>
+            <h3>User :{{ p.user }}</h3>
+            <h3>Title : {{ p.title }}</h3>
+            <p><strong>Slug:</strong> {{ p.slug }}</p>
+            <p><strong>Email:</strong> {{ p.email }}</p>
+            <p><strong>Salary:</strong> {{ p.salary }}</p>
+            <p><strong>Available:</strong> {{ p.available }}</p>
+            <p><strong>Category:</strong> {{ p.category }}</p>
+            <p><strong>Medium:</strong> {{ p.medium }}</p>
+            <p><strong>Details:</strong><br>{{ p.details }}</p>
+            <p><strong>Created At:</strong> {{ p.created_at }}</p>
+            <img src="{{ p.image.url }}" alt="{{ p.title }}" style="width:300px; height:auto;"><br>
+            <hr>
+        </div>
+    {% empty %}
+        <p>No posts found.</p>
+    {% endfor %}
+</div>
 {% endblock body %}

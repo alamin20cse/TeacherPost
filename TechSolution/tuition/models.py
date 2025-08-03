@@ -2,6 +2,11 @@ from django.db import models
 from django.utils.timezone import now
 from PIL import Image
 from django.utils.text import slugify
+from multiselectfield import MultiSelectField
+from django.contrib.auth.models import User
+
+
+
 # Create your models here.
 
 class Contact(models.Model):
@@ -10,11 +15,34 @@ class Contact(models.Model):
     content=models.TextField()
 
 
+
+
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Class_in(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
     CATEGORY=(
         ('Teacher',"Teacher"),
         ('Student','Studnet'),
     )
+
+    MEDIUM=(
+        ('bangla','bangla'),
+        ('english','english'),
+        ('hindi','hindi'),
+        ('urdho','urdho'),
+    )
+    user=models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     id=models.AutoField(primary_key=True)
     title=models.CharField(max_length=100)
     slug=models.CharField(max_length=100,default=title)
@@ -25,6 +53,20 @@ class Post(models.Model):
     category=models.CharField(max_length=100,choices=CATEGORY)
     created_at=models.DateTimeField(default=now)
     image=models.ImageField(default='default.jpeg',upload_to='tuition/images')
+    medium=MultiSelectField(max_length=200, max_choices=5,choices=MEDIUM,default='bangla')
+    subject=models.ManyToManyField(Subject,related_name='subject_set')
+    class_in=models.ManyToManyField(Class_in,related_name='class_set')
+
+
+
+
+
+
+
+
+
+
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super(Post, self).save(*args, **kwargs)
