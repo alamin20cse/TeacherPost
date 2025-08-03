@@ -2,19 +2,35 @@ from django.shortcuts import render,HttpResponse
 from .models import Contact,Post
 from .forms import ContactForm,PostForm
 
+from django.views.generic import FormView
+
 
 from django.views import View
 # Create your views here.
 def home(request):
     return render(request,'home.html')
 
-# class view
-class ContactView(View):
+
+
+ #FormView 
+class ContactView(FormView):
     form_class=ContactForm
     template_name='contact.html'
-    def get(self,request, *args, **kwargs):
-        form=self.form_class()
-        return render(request,self.template_name,{'form':form})
+    success_url='/'
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+
+
+
+# class view
+# class ContactView(View):
+#     form_class=ContactForm
+#     template_name='contact.html'
+#     def get(self,request, *args, **kwargs):
+#         form=self.form_class()
+#         return render(request,self.template_name,{'form':form})
 
 
     def post(self,request, *args, **kwargs):
@@ -30,7 +46,8 @@ class ContactView(View):
 
 
 
-# function view
+# function view 
+# if do in class view function vew is not need
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)  
@@ -60,6 +77,18 @@ def postview(request):
 #             form=PostForm()
 #         return render(request,'tuition/postcreate.html',{'form':form})
 
+
+
+# Createviews
+from django.views.generic import CreateView
+class PostCreateView(CreateView):
+    model=Post
+    form_class=PostForm
+    template_name= 'tuition/postcreate.html'
+    success_url='/'
+    def form_valid(self, form):
+        form.instance.user=self.request.user
+        return super().form_valid(form)
 
 def postcreate(request):
     if request.method == 'POST':
