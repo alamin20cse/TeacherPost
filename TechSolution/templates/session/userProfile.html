@@ -1,0 +1,28 @@
+{% extends 'basic.html' %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-4 text-center">
+      <img src="{{ user.userprofile.image.url }}" class="w-50 rounded-circle img-thumbnail" alt="Profile Image">
+    </div>
+  <div class="col-md-8">
+  <h5 class="mb-3">User Profile</h5>
+  <ul class="list-group list-group-flush">
+    {{user.userprofile}}
+    <li class="list-group-item"><strong>Name:</strong> {{ user.username }}</li>
+    <li class="list-group-item"><strong>Blood Group:</strong> {{ user.userprofile.blood_group }}</li>
+    <li class="list-group-item"><strong>Gender:</strong> {{ user.userProfile.gender }}</li>
+    <li class="list-group-item"><strong>Nationality:</strong> {{ user.userprofile.nationality }}</li>
+    <li class="list-group-item"><strong>Religion:</strong> {{ user.userprofile.religion }}</li>
+    <li class="list-group-item"><strong>Biodata:</strong> {{ user.userprofile.biodata }}</li>
+    <li class="list-group-item"><strong>Profession:</strong> {{ user.userprofile.profession }}</li>
+    <li class="list-group-item"><strong>Birth Date:</strong> {{ user.userprofile.birth_date }}</li>
+    <li class="list-group-item"><strong>Address:</strong> {{ user.userprofile.address }}</li>
+    <li class="list-group-item"><strong>Phone:</strong> {{ user.userprofile.phone }}</li>
+  </ul>
+</div>
+
+  </div>
+</div>
+{% endblock body %}

@@ -3,6 +3,7 @@ from .models import Contact,Post
 from .forms import ContactForm,PostForm
 
 from django.views.generic import FormView
+from django.urls import reverse_lazy
 
 
 from django.views import View
@@ -60,22 +61,75 @@ def contact(request):
 
 
 
+#not use def  postview 
+#ListView
+from django.views.generic import ListView
+class PostListView(ListView):
+    template_name='tuition/postlist.html'
+    model=Post
+    context_object_name='posts'
+    # only user 1 created post will  show for quesryset
+    queryset=Post.objects.filter(user=1)
+    def get_context_data(self, *args, **kwargs):
+        contex= super().get_context_data(*args, **kwargs)
+        contex['posts']=contex.get('object_list')
+        contex['msg']='This is Post List'
+        return contex
+
+# details view
+from django.views.generic import DetailView
+class PostDetailView(DetailView):
+    model=Post
+    template_name='tuition/postdetail.html'
+    def get_context_data(self, *args, **kwargs):
+        contex= super().get_context_data(*args, **kwargs)
+        contex['post']=contex.get('object')
+        contex['msg']='This is Post List'
+        return contex
+    
 
 def postview(request):
     post=Post.objects.all()
     return render(request,'tuition/postview.html',{'post':post})
 
 
-# def postcreate(request):
-#     if request.method=='POST':
-#         form=PostForm(request.POST.request.FILES)
-#         if form.is_valid():
-#             obj=form.save(commit=False)
-#             obj.user=request.user
-#             obj.save()
-#         else:
-#             form=PostForm()
-#         return render(request,'tuition/postcreate.html',{'form':form})
+
+
+#updat view
+from django.views.generic import UpdateView,DeleteView
+class PostEditView(UpdateView):
+    model=Post
+    form_class=PostForm
+    template_name='tuition/postcreate.html'
+    def get_success_url(self):
+        id=self.object.id
+        return reverse_lazy('tuition:postdetail',kwargs={'pk':id})
+
+
+
+
+#Delete View
+
+class PostDeleteView(DeleteView):
+    model=Post
+    template_name='tuition/delete.html'
+    success_url= reverse_lazy('tuition:postlist')
+
+
+
+
+
+#create view will work so this dont need
+def postcreate(request):
+    if request.method=='POST':
+        form=PostForm(request.POST.request.FILES)
+        if form.is_valid():
+            obj=form.save(commit=False)
+            obj.user=request.user
+            obj.save()
+        else:
+            form=PostForm()
+        return render(request,'tuition/postcreate.html',{'form':form})
 
 
 

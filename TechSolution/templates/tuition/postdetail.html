@@ -1,0 +1,27 @@
+{% extends 'basic.html' %}
+{% block body %}
+<h2>{{ post.title }}</h2>
+<p>By {{ post.user.username }}</p> 
+subject : <br>{% for s in object.subject.all  %}
+{{s.name}} <br>
+
+{% endfor %}
+class : <br> {% for s in object.class_in.all  %}
+{{s.name}} <br>
+
+{% endfor %}
+
+msg: {{msg}}
+<br>
+post title: <h1>{{post.title}}</h1>
+
+{% if request.user == object.user %}
+  <a href="/tuition/edit/{{object.id}}/">Edit</a>
+{% endif %}
+
+{% if request.user == object.user %}
+  <a href="/tuition/delete/{{object.id}}/">Delete</a>
+{% endif %}
+
+
+{% endblock body %}
