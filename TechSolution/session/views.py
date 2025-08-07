@@ -1,87 +1,68 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth.forms import AuthenticationForm,PasswordChangeForm
-from django.contrib.auth import authenticate,login,logout,update_session_auth_hash
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib import messages
-# Create your views here.
+from .forms import SignUpForm, UserProfileform
+from .models import UserProfile
 
 def loginuser(request):
-    if request.method=='POST':
-        form=AuthenticationForm(request=request,data=request.POST)
+    if request.method == 'POST':
+        form = AuthenticationForm(request=request, data=request.POST)
         if form.is_valid():
-            username=form.cleaned_data.get('username')
-            password=form.cleaned_data.get('password')
-            user=authenticate(username=username,password=password)
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
             if user is not None:
-                login(request,user)
+                login(request, user)
                 return redirect('homeview')
             else:
                 messages.error(request, 'Invalid username or password')
         else:
-                messages.error(request, 'Invalid username or password')
+            messages.error(request, 'Invalid username or password')
     else:
-         form=AuthenticationForm()
-    return render(request,'session/login.html',{'form':form})
-
-
+        form = AuthenticationForm()
+    return render(request, 'session/login.html', {'form': form})
 
 def logoutuser(request):
     logout(request)
-    messages.success(request,'succesfully logout ')
+    messages.success(request, 'Successfully logged out')
     return redirect('homeview')
 
-from .forms import SignUpForm
 def registration(request):
-    if request.method=='POST':
-        form=SignUpForm(request.POST)
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            # Profile created automatically by signal
             return redirect('session:login')
     else:
-        form=SignUpForm()
-    return render(request,'session/signup.html',{'form':form})
-
+        form = SignUpForm()
+    return render(request, 'session/signup.html', {'form': form})
 
 def change_password(request):
-    if request.method=='POST':
-        form=PasswordChangeForm(data=request.POST,user=request.user)
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
         if form.is_valid():
             form.save()
-            update_session_auth_hash(request,form.user)
-            messages.success(request,'password has changed succesfully')
+            update_session_auth_hash(request, form.user)
+            messages.success(request, 'Password changed successfully')
             return redirect('homeview')
     else:
-        form=PasswordChangeForm(user=request.user)
-    return render(request,'session/change_pass.html',{'form':form})
+        form = PasswordChangeForm(user=request.user)
+    return render(request, 'session/change_pass.html', {'form': form})
 
-
-from .forms import UserProfileform
-from .models import UserProfile
 def userProfile(request):
-    try:
-        instance = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        instance = None
-
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     if request.method == "POST":
-        if instance:
-            form = UserProfileform(request.POST, request.FILES, instance=instance)
-        else:
-            form = UserProfileform(request.POST, request.FILES)
+        form = UserProfileform(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.user = request.user
-            obj.save()
+            form.save()
             messages.success(request, "Successfully saved your profile")
-            return redirect('homeview')  # Replace with your actual redirect target
+            return redirect('homeview')
     else:
-        form = UserProfileform(instance=instance)
-    context={
-        'form':form
-    }
-
-    return render(request, 'session/user_profile_create.html', context)
+        form = UserProfileform(instance=profile)
+    return render(request, 'session/user_profile_create.html', {'form': form})
 
 def OwnerProfile(request):
-    user=request.user
-    return render(request,'session/userProfile.html',{'user':user})
+    return render(request, 'session/userProfile.html', {'user': request.user})

@@ -1,28 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Create your models here.
 class UserProfile(models.Model):
-    GENRE_CHOICES = (
-        ('Male', 'MALE'),
-        ('Female', 'FEMALE')
-    )
-
-    CATEGORY = (
-        ('Student', 'Student'),
-        ('Teacher', 'Teacher')
-    )
-    
-
-    # Gender choices
     GENDER_CHOICES = (
         ('Male', 'Male'),
         ('Female', 'Female'),
         ('Other', 'Other'),
     )
 
-    # Blood group choices
     BLOOD_GROUP = (
         ('A+', 'A+'),
         ('A-', 'A-'),
@@ -34,9 +22,13 @@ class UserProfile(models.Model):
         ('O-', 'O-'),
     )
 
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    birth_date = models.DateField()
+    CATEGORY = (
+        ('Student', 'Student'),
+        ('Teacher', 'Teacher'),
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')  # ✅ related_name fixed
+    birth_date = models.DateField(null=True, blank=True)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP)
     gender = models.CharField(max_length=50, choices=GENDER_CHOICES)
     address = models.CharField(max_length=150)
@@ -57,3 +49,14 @@ class UserProfile(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+# ✅ Signals to create and save profile automatically
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
